@@ -7,6 +7,12 @@
     <title>Cart Page</title>
     <style>
       /* All Your css for Cart page goes here  */
+
+      #cart-container{
+        display: grid;
+        grid-template-columns: repeat(3, 1fr); /* Three columns with equal width */
+        gap: 20px; 
+      }
     </style>
   </head>
   <body>
@@ -22,5 +28,53 @@
       <!-- Here Append All the Cart Cards here-->
     </div>
   </body>
-  <script type="module"></script>
+  <script type="module">
+
+let cart=JSON.parse(localStorage.getItem('cart'))||[]
+
+let container=document.getElementById('cart-container')
+
+function display (){
+  container.innerHTML = ""
+
+  cart.forEach((prod) => {
+    let card=document.createElement('div')
+          let img=document.createElement("img")
+          let title=document.createElement("h3")
+          let brand=document.createElement("h4")
+          let category=document.createElement("h3")
+          let price=document.createElement("h4")
+          let button1=document.createElement("button")
+         
+
+          img.src=prod.image
+          title.textContent=prod.title
+          brand.textContent=prod.brand
+          category.textContent=prod.category
+         price.textContent=prod.price
+         button1.textContent="DELETE"
+
+         button1.addEventListener("click",()=>{
+          cart=cart.filter((ele)=>{
+            return ele.id!==prod.id
+          })
+
+          localStorage.setItem("cart",JSON.stringify(cart))
+
+          display()
+         })
+
+
+         card.append(img,title,brand,category,price,button1)
+
+         container.append(card)
+  });
+}
+
+display()
+
+
+
+
+  </script>
 </html>

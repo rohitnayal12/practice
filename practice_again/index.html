@@ -7,6 +7,17 @@
     <title>Home Page</title>
     <style>
       /* All CSS For Home Page Goes Here  */
+
+      main{
+        display: flex;
+        justify-content: center;
+      }
+
+      #product-container{
+        display: grid;
+        grid-template-columns: repeat(3, 1fr); /* Three columns with equal width */
+        gap: 20px; 
+      }
     </style>
   </head>
 
@@ -16,48 +27,50 @@
       <a href="./index.html">Home</a>
       <a href="./cart.html">Cart</a>
     </div>
-    <h1 id="alert"></h1>
+    <h1 id="alert">
+
+    </h1>
     <main>
       <div id="filter">
         <div id="brand-filter">
           <h2>Filter By Brands</h2>
           <div>
-            <input type="checkbox" id="roadster" />
+            <input type="checkbox" id="roadster" value="roadster" />
             <p>Roadster</p>
           </div>
           <div>
-            <input type="checkbox" id="blackberrys" />
+            <input type="checkbox" id="blackberrys" value="blackberrys" />
             <p>Blackberrys</p>
           </div>
           <div>
-            <input type="checkbox" id="van-heusen" />
+            <input type="checkbox" id="van-heusen" value="van-heusen" />
             <p>Van Heusen</p>
           </div>
           <div>
-            <input type="checkbox" id="allen-solly" />
+            <input type="checkbox" id="allen-solly" value="allen-solly" />
             <p>Allen Solly</p>
           </div>
           <div>
-            <input type="checkbox" id="twills" />
+            <input type="checkbox" id="twills"  value="twills" />
             <p>Twills</p>
           </div>
         </div>
         <div id="category-filter">
           <h2>Filter By Categories</h2>
           <div>
-            <input type="checkbox" id="men" />
+            <input type="checkbox" id="men" value="men" />
             <p>Men</p>
           </div>
           <div>
-            <input type="checkbox" id="women" />
+            <input type="checkbox" id="women" value="women" />
             <p>Women</p>
           </div>
           <div>
-            <input type="checkbox" id="homedecor" />
+            <input type="checkbox" id="homedecor" value="homedecor" />
             <p>Homedecor</p>
           </div>
           <div>
-            <input type="checkbox" id="kids" />
+            <input type="checkbox" id="kids"  value="kids" />
             <p>Kids</p>
           </div>
         </div>
@@ -71,5 +84,136 @@
   </body>
   <script type="module">
     // All Your Script for Home Page Goes Here
+
+    let brandFilter = document.getElementById("brand-filter");
+let categoryFilter = document.getElementById("category-filter");
+
+    async function fetchdata(){
+     
+
+      fetch("https://practice-api-xurt.onrender.com/data")
+      .then((res)=>{
+        return res.json()
+      })
+      .then((data)=>{
+        console.log(data)
+        filterdata(data)
+      })
+      .catch((err)=>{
+        console.log(err)
+      })
+      }
+      fetchdata()
+
+      function getSelectedCheckboxValues(filterElement) {
+  const checkboxes = filterElement.querySelectorAll('input[type="checkbox"]:checked');
+  return Array.from(checkboxes).map((checkbox) => checkbox.value);
+}
+
+brandFilter.addEventListener("change", () => {
+  fetchdata();
+});
+
+categoryFilter.addEventListener("change", () => {
+  fetchdata();
+});
+
+function filterdata(data) {
+  const brandFilterValues = getSelectedCheckboxValues(brandFilter);
+  const categoryFilterValues = getSelectedCheckboxValues(categoryFilter);
+
+  let filteredData = data;
+
+  if (brandFilterValues.length > 0) {
+    filteredData = filteredData.filter((prod) => brandFilterValues.includes(prod.brand));
+  }
+
+  if (categoryFilterValues.length > 0) {
+    filteredData = filteredData.filter((prod) => categoryFilterValues.includes(prod.category));
+  }
+
+  displayproduct(filteredData);
+}
+
+
+
+
+
+let productcontainer=document.getElementById("product-container")
+let cartarr=JSON.parse(localStorage.getItem("cart")) ||[]
+
+let alertt=document.getElementById("alert")
+
+
+
+
+      function displayproduct(data){
+
+        productcontainer.innerHTML=""
+
+        data.forEach((prod)=>{
+
+          let productdiv=document.createElement("div")
+          let img=document.createElement("img")
+          let title=document.createElement("h3")
+          let brand=document.createElement("h4")
+          let category=document.createElement("h3")
+          let price=document.createElement("h4")
+          let button1=document.createElement("button")
+         
+
+          img.src=prod.image
+          title.textContent=prod.title
+          brand.textContent=prod.brand
+          category.textContent=prod.category
+         price.textContent=prod.price
+         button1.textContent="ADD TO CART"
+     
+
+         button1.addEventListener("click",()=>{
+
+           if(alreadypresnt(prod)){
+            alertt.textContent="Product already in the cart."
+           }
+           else{
+
+            cartarr.push(prod)
+            localStorage.setItem("cart",JSON.stringify(cartarr));
+            alertt.textContent="Product is added to cart"
+           }
+
+
+         })
+
+        
+
+
+
+
+
+         
+         productdiv.append(img,brand,category,title,price,button1)
+
+         productcontainer.append(productdiv)
+
+        })
+      }
+
+      function alreadypresnt(prod){
+        console.log(prod.id)
+       
+           for(let i=0;i<cartarr.length;i++){
+            console.log(cartarr[i].id)
+            if(cartarr[i].id==prod.id){
+              return true
+            } 
+           
+            
+           }
+           return false
+      }
+
+
+
   </script>
 </html>
